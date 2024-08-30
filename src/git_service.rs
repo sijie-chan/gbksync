@@ -12,4 +12,7 @@ impl GitService {
             interval: 10,
         }
     }
+    pub fn setInterval(&mut self, i: usize) -> &Self {
+        self.interval = i;
+    }
 }
