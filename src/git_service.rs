@@ -1,6 +1,6 @@
-use git2::{Commit, Error, Repository, Oid};
+use git2::{Commit, Error, Oid, Repository};
 use std::path::Path;
-use tokio::time::{interval, Interval, Duration};
+use tokio::time::{interval, Duration, Interval};
 
 pub struct GitService {
     repo: Repository,
@@ -13,15 +13,18 @@ pub struct GitService {
 impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, Error> {
         let repo = Repository::init(repo_path)?;
-        Ok(GitService { repo, interval: 10,interval_count:0 })
+        Ok(GitService {
+            repo,
+            interval: 10,
+            interval_count: 0,
+            commit_interval: interval(10),
+        })
     }
     pub fn setInterval(&mut self, i: usize) -> &Self {
         self.interval = i;
         self
     }
-    pub fn start(&self) {
-
-    }
+    pub fn start(&self) {}
     pub fn stop(&self) {}
 
     // private fns
