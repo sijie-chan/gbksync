@@ -27,7 +27,11 @@ impl GitService {
     }
     pub fn start(&self) {
        // use thread 
-       std::thread::spawn(|| {});
+       std::thread::spawn(|| {
+        self.stage_files();
+        self.commit_files();
+        self.push("origin");
+       });
     }
     pub fn stop(&self) {}
 
