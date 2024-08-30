@@ -1,4 +1,4 @@
-use git2::{Commit, Repository, Error};
+use git2::{Commit, Error, Repository};
 use std::path::Path;
 
 pub struct GitService {
@@ -10,10 +10,7 @@ pub struct GitService {
 impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, Error> {
         let repo = Repository::init(repo_path)?;
-        Ok(GitService {
-            repo,
-            interval: 10,
-        })
+        Ok(GitService { repo, interval: 10 })
     }
     pub fn setInterval(&mut self, i: usize) -> &Self {
         self.interval = i;
@@ -25,12 +22,12 @@ impl GitService {
     // private fns
     fn stage_files(&self) -> Result<usize, Error> {
         let mut index = self.repo.index()?;
-    
+
         // for loop add_path
         let statuses = self.repo.statuses(None)?;
-    
+
         let mut file_count = 0;
-    
+
         for file in statuses.iter() {
             let status = file.status();
             if status.is_wt_new() || status.is_wt_modified() {
@@ -41,9 +38,47 @@ impl GitService {
                 }
             }
         }
-    
+
         index.write()?;
-    
+
         Ok(file_count)
+    }
+
+    pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
+        let mut index = repo.index()?;
+        let tree_id = index.write_tree()?;
+        let tree = repo.find_tree(tree_id)?;
+        // let tree = repo
+
+        let mut parents = vec![];
+
+        if let Some(head) = repo.head().ok() {
+            let commit = head.peel_to_commit()?;
+            parents.push(commit);
+        }
+        let sig = repo.signature()?;
+
+        // message is constructed using file_name + time
+
+        let message = format!("Update {}", "file");
+
+        let commit_id = repo.commit(
+            Some("HEAD"),
+            &sig,
+            &sig,
+            &message,
+            &tree,
+            &parents.iter().collect::<Vec<&Commit>>(),
+        )?;
+
+        Ok(commit_id)
+    }
+
+    pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
+        let remote = repo.find_remote(remote)?;
+        println!("{:?}", remote.name());
+
+        // remote.push(refspecs, opts)?;
+        Ok(())
     }
 }
