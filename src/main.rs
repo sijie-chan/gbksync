@@ -11,6 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         commit_interval.tick().await;
+        println!("make commit");
         stage_files(&repo).ok();//.expect("stage file error");
         commit_files(&repo).ok();//.expect("commit file failed");
         push(&repo, "origin").ok();
