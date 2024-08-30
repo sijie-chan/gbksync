@@ -14,7 +14,7 @@ impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, Error> {
         let repo = Repository::init(repo_path)?;
         Ok(GitService {
-            repo,
+            repo: Arc::new(repo),
             interval: 10,
             interval_count: 0,
             commit_interval: interval(Duration::from_secs(10)),
