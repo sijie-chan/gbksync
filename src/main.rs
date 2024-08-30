@@ -20,6 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         interval_count = (interval_count + 1) % 10;
         match stage_files(&repo).ok() {
             Some(file_count) if file_count != 0 => {
+                info!("staged {file_count} files");
                 //.expect("stage file error");
                 commit_files(&repo).ok(); //.expect("commit file failed");
             }
