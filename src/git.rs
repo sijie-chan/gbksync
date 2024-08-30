@@ -55,3 +55,12 @@ pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
 
     Ok(commit_id)
 }
+
+pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
+    
+    let remote = repo.find_remote(remote)?;
+    println!("{:?}", remote.name());
+
+    // remote.push(refspecs, opts)?;
+    Ok(())
+}
