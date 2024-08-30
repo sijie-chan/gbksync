@@ -43,7 +43,7 @@ impl GitService {
 
     // private fns
     fn stage_files(&self) -> Result<usize, Error> {
-        let mut index = self.repo.clone().lock()?.index()?;
+        let mut index = self.repo.clone().lock().unwrap().index()?;
 
         // for loop add_path
         let statuses = self.repo.statuses(None)?;
