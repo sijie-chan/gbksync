@@ -22,9 +22,12 @@ impl GitService {
     }
     pub fn setInterval(&mut self, i: usize) -> &Self {
         self.interval = i;
+        // TODO update
         self
     }
-    pub fn start(&self) {}
+    pub fn start(&self) {
+       // use thread 
+    }
     pub fn stop(&self) {}
 
     // private fns
