@@ -28,6 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => {}
         }
         if interval_count == 0 {
+            info!("ready to push commits");
             push(&repo, "origin").ok();
         }
     }
