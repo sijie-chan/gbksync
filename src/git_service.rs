@@ -1,6 +1,6 @@
 use git2::{Commit, Error, Repository, Oid};
 use std::path::Path;
-use tokio::time::{interval, Duration};
+use tokio::time::{interval, Interval, Duration};
 
 pub struct GitService {
     repo: Repository,
@@ -18,7 +18,9 @@ impl GitService {
         self.interval = i;
         self
     }
-    pub fn start(&self) {}
+    pub fn start(&self) {
+
+    }
     pub fn stop(&self) {}
 
     // private fns
