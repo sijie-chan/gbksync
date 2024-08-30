@@ -4,7 +4,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tokio::time::{interval, Duration, Interval};
-
+use git::*;
 
 pub struct GitService {
     repo: Arc<Mutex<Repository>>,
