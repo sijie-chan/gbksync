@@ -1,5 +1,8 @@
 use git2::{Commit, Error, Oid, Repository};
-use std::{path::Path, sync::{Arc, Mutex}};
+use std::{
+    path::Path,
+    sync::{Arc, Mutex},
+};
 use tokio::time::{interval, Duration, Interval};
 
 pub struct GitService {
@@ -28,13 +31,13 @@ impl GitService {
     pub fn start(&self) {
         let repo = Arc::clone(&self.repo);
         // Lock
-       // use thread 
-       std::thread::spawn(move || {
+        // use thread
+        std::thread::spawn(move || {
             let repo = repo.lock().unwrap();
             self.stage_files();
             self.commit_files();
             self.push("origin");
-       });
+        });
     }
     pub fn stop(&self) {}
 
