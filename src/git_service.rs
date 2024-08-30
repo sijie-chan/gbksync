@@ -1,6 +1,7 @@
 use git2::{Commit, Repository};
 pub struct GitService {
     repo: Repository,
+    interval: int,
 }
 
 impl GitService {
