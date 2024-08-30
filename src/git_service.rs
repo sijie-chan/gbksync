@@ -1,3 +1,4 @@
+use git2::{Repository, Commit};
 pub struct GitService {
     
 }
