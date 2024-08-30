@@ -24,6 +24,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let gitService = GitService::new("/Users/apple/Projects/gbksync")?;
 
+    return;
+
     let repo_path = "/Users/apple/Projects/gbksync";
     info!("open repository: {}", repo_path);
     let repo = open(repo_path).expect("current repo is not a repo");
