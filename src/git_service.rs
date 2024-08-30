@@ -1,7 +1,6 @@
-use git2::{Repository, Commit};
+use git2::{Commit, Repository};
 pub struct GitService {
-    repo: Repository
-    
+    repo: Repository,
 }
 
 impl GitService {
