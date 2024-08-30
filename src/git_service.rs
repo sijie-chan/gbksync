@@ -12,7 +12,7 @@ pub struct GitService {
 impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, Error> {
         let repo = Repository::init(repo_path)?;
-        Ok(GitService { repo, interval: 10 })
+        Ok(GitService { repo, interval: 10,interval_count:0 })
     }
     pub fn setInterval(&mut self, i: usize) -> &Self {
         self.interval = i;
