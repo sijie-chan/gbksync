@@ -1,5 +1,6 @@
 use git2::{Commit, Error, Repository, Oid};
 use std::path::Path;
+use tokio::time::{interval, Duration};
 
 pub struct GitService {
     repo: Repository,
