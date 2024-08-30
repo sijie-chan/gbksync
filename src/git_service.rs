@@ -6,6 +6,7 @@ pub struct GitService {
     repo: Repository,
     // seconds
     interval: usize,
+    interval_count: u128,
 }
 
 impl GitService {
