@@ -26,6 +26,7 @@ impl GitService {
         self
     }
     pub fn start(&self) {
+        // Lock
        // use thread 
        std::thread::spawn(|| {
         self.stage_files();
