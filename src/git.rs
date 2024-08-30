@@ -19,7 +19,7 @@ pub fn stage_files(repo: &Repository) -> Result<usize, Error> {
             if let Some(p) = file.path() {
                 let path = Path::new(p);
                 index.add_path(path)?;
-                file_count+=1;
+                file_count += 1;
             }
         }
     }
@@ -60,7 +60,6 @@ pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
 }
 
 pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
-    
     let remote = repo.find_remote(remote)?;
     println!("{:?}", remote.name());
 
