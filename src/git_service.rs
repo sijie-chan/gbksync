@@ -22,10 +22,10 @@ impl GitService {
 
     // private fns
     fn stage_files(&self) -> Result<usize, Error> {
-        let mut index = repo.index()?;
+        let mut index = self.repo.index()?;
     
         // for loop add_path
-        let statuses = repo.statuses(None)?;
+        let statuses = self.repo.statuses(None)?;
     
         let mut file_count = 0;
     
