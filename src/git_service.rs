@@ -74,8 +74,8 @@ impl GitService {
         Ok(commit_id)
     }
 
-    fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
-        let remote = repo.find_remote(remote)?;
+    fn push(&self, remote: &str) -> Result<(), Error> {
+        let remote = self.repo.find_remote(remote)?;
         println!("{:?}", remote.name());
 
         // remote.push(refspecs, opts)?;
