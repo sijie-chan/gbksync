@@ -7,7 +7,7 @@ use tokio::time::{interval, Duration};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let repo = open("./")?;//.expect("current repo is not a repo");
-    let mut commit_interval = interval(Duration::from_secs(300));
+    let mut commit_interval = interval(Duration::from_secs(10));
 
     loop {
         commit_interval.tick().await;
