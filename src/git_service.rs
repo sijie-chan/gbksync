@@ -34,7 +34,7 @@ impl GitService {
         // use thread
         std::thread::spawn(move || {
             let repo = repo.lock().unwrap();
-            self.stage_files();
+            // self.stage_files();
             // self.commit_files();
             // self.push("origin");
         });
