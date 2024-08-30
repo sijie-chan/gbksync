@@ -17,4 +17,6 @@ impl GitService {
         self.interval = i;
         self
     }
+    pub fn start(&self) {}
+    pub fn stop(&self) {}
 }
