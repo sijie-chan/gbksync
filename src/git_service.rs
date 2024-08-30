@@ -27,6 +27,7 @@ impl GitService {
     }
     pub fn start(&self) {
        // use thread 
+       std::thread::spawn(|| {});
     }
     pub fn stop(&self) {}
 
