@@ -5,11 +5,13 @@ pub fn open(dir_path: &str) -> Result<Repository, Error> {
     Repository::init(dir_path)
 }
 
-pub fn stage_files(repo: &Repository) -> Result<(), Error> {
+pub fn stage_files(repo: &Repository) -> Result<usize, Error> {
     let mut index = repo.index()?;
 
     // for loop add_path
     let statuses = repo.statuses(None)?;
+
+    let mut file_count = 0;
 
     for file in statuses.iter() {
         let status = file.status();
@@ -17,13 +19,14 @@ pub fn stage_files(repo: &Repository) -> Result<(), Error> {
             if let Some(p) = file.path() {
                 let path = Path::new(p);
                 index.add_path(path)?;
+                file_count+=1;
             }
         }
     }
 
     index.write()?;
 
-    Ok(())
+    Ok(file_count)
 }
 
 pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
