@@ -1,4 +1,6 @@
 use git2::{Commit, Repository, Error};
+use std::path::Path;
+
 pub struct GitService {
     repo: Repository,
     // seconds
