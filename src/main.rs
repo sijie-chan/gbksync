@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let gitService = GitService::new("/Users/apple/Projects/gbksync")?;
 
-    return;
+    return Ok(());
 
     let repo_path = "/Users/apple/Projects/gbksync";
     info!("open repository: {}", repo_path);
