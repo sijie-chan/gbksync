@@ -22,6 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Some(file_count) if file_count != 0 => {
                 info!("staged {file_count} files");
                 //.expect("stage file error");
+                info!("ready to commit files");
                 commit_files(&repo).ok(); //.expect("commit file failed");
             }
             _ => {}
