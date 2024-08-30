@@ -1,4 +1,5 @@
 mod git;
+mod git_service;
 use git::*;
 
 use rui::*;
