@@ -1,4 +1,4 @@
-use git2::{Commit, Repository};
+use git2::{Commit, Repository, Error};
 pub struct GitService {
     repo: Repository,
     // seconds
@@ -6,7 +6,7 @@ pub struct GitService {
 }
 
 impl GitService {
-    pub fn new(repo_path: &str) -> Result<Self, String> {
+    pub fn new(repo_path: &str) -> Result<Self, Error> {
         let repo = Repository::init(repo_path)?;
         Ok(GitService {
             repo,
