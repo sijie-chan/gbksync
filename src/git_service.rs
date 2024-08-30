@@ -37,9 +37,7 @@ impl GitService {
             let repo = repo.lock().unwrap();
             stage_files(&repo).unwrap();
             commit_files(&repo).unwrap();
-            // self.stage_files();
-            // self.commit_files();
-            // self.push("origin");
+            push(&repo, "origin").unwrap();
         });
     }
     pub fn stop(&self) {}
