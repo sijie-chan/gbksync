@@ -26,12 +26,14 @@ impl GitService {
         self
     }
     pub fn start(&self) {
+        let repo = Arc::clone(&self.repo);
         // Lock
        // use thread 
-       std::thread::spawn(|| {
-        self.stage_files();
-        self.commit_files();
-        self.push("origin");
+       std::thread::spawn(move || {
+            let repo = repo.lock().unwrap();
+            self.stage_files();
+            self.commit_files();
+            self.push("origin");
        });
     }
     pub fn stop(&self) {}
