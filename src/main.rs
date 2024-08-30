@@ -3,6 +3,7 @@ mod git_service;
 
 use git::*;
 
+use git_service::GitService;
 use rui::*;
 use std::fs::File;
 use tokio::time::{interval, Duration};
@@ -20,6 +21,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(fmt::layer().with_writer(file))
         .with(fmt::layer().with_writer(std::io::stdout))
         .init();
+
+    let gitService = GitService::new("/Users/apple/Projects/gbksync")?;
 
     let repo_path = "/Users/apple/Projects/gbksync";
     info!("open repository: {}", repo_path);
