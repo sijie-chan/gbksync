@@ -1,4 +1,4 @@
-use git2::{Commit, Error, Repository};
+use git2::{Commit, Error, Oid, Repository};
 use std::path::Path;
 
 pub fn open(dir_path: &str) -> Result<Repository, Error> {
@@ -26,7 +26,7 @@ pub fn stage_files(repo: &Repository) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn commit_files(repo: &Repository) -> Result<(), Error> {
+pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
     let mut index = repo.index()?;
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
@@ -40,14 +40,18 @@ pub fn commit_files(repo: &Repository) -> Result<(), Error> {
     }
     let sig = repo.signature()?;
 
+    // message is constructed using file_name + time
+
+    let message = format!("Update {}", "file");
+
     let commit_id = repo.commit(
         Some("HEAD"),
         &sig,
         &sig,
-        "Message",
+        &message,
         &tree,
         &parents.iter().collect::<Vec<&Commit>>(),
     )?;
 
-    Ok(())
+    Ok(commit_id)
 }
