@@ -44,8 +44,8 @@ impl GitService {
         Ok(file_count)
     }
 
-    fn commit_files(repo: &Repository) -> Result<Oid, Error> {
-        let mut index = repo.index()?;
+    fn commit_files(&self) -> Result<Oid, Error> {
+        let mut index = self.repo.index()?;
         let tree_id = index.write_tree()?;
         let tree = repo.find_tree(tree_id)?;
         // let tree = repo
