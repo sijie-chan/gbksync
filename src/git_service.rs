@@ -62,7 +62,7 @@ impl GitService {
 
         let message = format!("Update {}", "file");
 
-        let commit_id = repo.commit(
+        let commit_id = self.repo.commit(
             Some("HEAD"),
             &sig,
             &sig,
