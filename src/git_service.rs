@@ -44,7 +44,7 @@ impl GitService {
         Ok(file_count)
     }
 
-    pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
+    fn commit_files(repo: &Repository) -> Result<Oid, Error> {
         let mut index = repo.index()?;
         let tree_id = index.write_tree()?;
         let tree = repo.find_tree(tree_id)?;
@@ -74,7 +74,7 @@ impl GitService {
         Ok(commit_id)
     }
 
-    pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
+    fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
         let remote = repo.find_remote(remote)?;
         println!("{:?}", remote.name());
 
