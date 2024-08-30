@@ -1,4 +1,4 @@
-use git2::{Commit, Error, Repository};
+use git2::{Commit, Error, Repository, Oid};
 use std::path::Path;
 
 pub struct GitService {
