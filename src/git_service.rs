@@ -7,7 +7,7 @@ pub struct GitService {
 
 impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, String> {
-        let repo = Repository::init(dir_path)?;
+        let repo = Repository::init(repo_path)?;
         GitService {
             repo,
             interval: 10,
