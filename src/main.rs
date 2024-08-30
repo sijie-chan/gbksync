@@ -22,7 +22,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(fmt::layer().with_writer(std::io::stdout))
         .init();
 
-    let gitService = GitService::new("/Users/apple/Projects/gbksync")?;
+    let mut gitService = GitService::new("/Users/apple/Projects/gbksync")?;
+    gitService.start();
 
     return Ok(());
 
