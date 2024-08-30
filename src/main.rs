@@ -11,7 +11,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // install global collector configured based on RUST_LOG env var.
     tracing_subscriber::fmt::init();
 
-    let repo = open("./")?; //.expect("current repo is not a repo");
+    let repo_path = "./";
+    info!("open repository: {}", repo_path);
+    let repo = open(repo_path)?; //.expect("current repo is not a repo");
     let mut commit_interval = interval(Duration::from_secs(10));
     let mut interval_count = 0;
 
