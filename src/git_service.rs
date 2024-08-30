@@ -1,9 +1,9 @@
 use git2::{Commit, Error, Oid, Repository};
-use std::{path::Path, sync::Arc};
+use std::{path::Path, sync::{Arc, Mutex}};
 use tokio::time::{interval, Duration, Interval};
 
 pub struct GitService {
-    repo: Arc<Repository>,
+    repo: Arc<Mutex<Repository>>,
     // seconds
     interval: usize,
     interval_count: u128,
