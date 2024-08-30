@@ -2,8 +2,21 @@
 name = "gbksync"
 version = "0.1.0"
 edition = "2021"
+description = ""
 
 [dependencies]
 git2 = "0.19.0"
 rui = "0.6.1"
 tokio = { version = "1", features = ["full"] }
+
+
+[package.metadata.bundle]
+name = "GitBackSync"
+identifier = "online.welkin.gbksync"
+version = "1.0.0"
+category = "Developer Tool"
+copyright = "Copyright (c) Yuhang Qin 2024. All rights reserved."
+short_description = "An Scheduled Git committer & pusher."
+long_description = """
+This tool help schedule commit and push files.
+"""
