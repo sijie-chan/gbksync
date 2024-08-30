@@ -1,10 +1,14 @@
+use crate::git::*;
 use git2::{Commit, Error, Oid, Repository};
 use std::{
     path::Path,
-    sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, thread::JoinHandle,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
+    thread::JoinHandle,
 };
 use tokio::time::{interval, Duration, Interval};
-use crate::git::*;
 
 pub struct GitService {
     repo: Arc<Mutex<Repository>>,
@@ -49,7 +53,6 @@ impl GitService {
                 commit_files(&repo).unwrap();
                 push(&repo, "origin").unwrap();
             }
-            
         });
         self.thread_handle = Some(handle);
     }
@@ -61,5 +64,4 @@ impl GitService {
             }
         }
     }
-
 }
