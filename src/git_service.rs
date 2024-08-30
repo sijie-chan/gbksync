@@ -47,16 +47,16 @@ impl GitService {
     fn commit_files(&self) -> Result<Oid, Error> {
         let mut index = self.repo.index()?;
         let tree_id = index.write_tree()?;
-        let tree = repo.find_tree(tree_id)?;
+        let tree = self.repo.find_tree(tree_id)?;
         // let tree = repo
 
         let mut parents = vec![];
 
-        if let Some(head) = repo.head().ok() {
+        if let Some(head) = self.repo.head().ok() {
             let commit = head.peel_to_commit()?;
             parents.push(commit);
         }
-        let sig = repo.signature()?;
+        let sig = self.repo.signature()?;
 
         // message is constructed using file_name + time
 
