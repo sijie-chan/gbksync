@@ -4,5 +4,7 @@ pub struct GitService {
 }
 
 impl GitService {
-    pub fn new(repo_path: &str) {}
+    pub fn new(repo_path: &str) -> Self {
+        GitService{repo: Repository::init(dir_path)}
+    }
 }
