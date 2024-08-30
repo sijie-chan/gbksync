@@ -47,7 +47,7 @@ impl GitService {
         let mut index = repo.index()?;
 
         // for loop add_path
-        let statuses = self.repo.statuses(None)?;
+        let statuses = repo.statuses(None)?;
 
         let mut file_count = 0;
 
