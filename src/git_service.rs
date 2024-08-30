@@ -51,8 +51,15 @@ impl GitService {
             }
             
         });
+        self.thread_handle = Some(handle);
     }
-    pub fn stop(&self) {}
-
+    pub fn stop(&mut self) {
+        if let Some(handle) = self.thread_handle.take() {
+            self.running.store(false, Ordering::SeqCst);
+            if let Err(e) = handle.join() {
+                eprintln!("Error joining thread: {:?}", e);
+            }
+        }
+    }
 
 }
