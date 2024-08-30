@@ -19,9 +19,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(fmt::layer().with_writer(std::io::stdout))
         .init();
 
-    let repo_path = "./";
+    let repo_path = "/Users/apple/Projects/gbksync";
     info!("open repository: {}", repo_path);
-    let repo = open(repo_path)?; //.expect("current repo is not a repo");
+    let repo = open(repo_path).expect("current repo is not a repo");
     let mut commit_interval = interval(Duration::from_secs(10));
     let mut interval_count = 0;
     let mut intervals = 0;
