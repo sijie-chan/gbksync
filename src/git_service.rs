@@ -19,4 +19,29 @@ impl GitService {
     }
     pub fn start(&self) {}
     pub fn stop(&self) {}
+
+    // private fns
+    fn stage_files(&self) -> Result<usize, Error> {
+        let mut index = repo.index()?;
+    
+        // for loop add_path
+        let statuses = repo.statuses(None)?;
+    
+        let mut file_count = 0;
+    
+        for file in statuses.iter() {
+            let status = file.status();
+            if status.is_wt_new() || status.is_wt_modified() {
+                if let Some(p) = file.path() {
+                    let path = Path::new(p);
+                    index.add_path(path)?;
+                    file_count += 1;
+                }
+            }
+        }
+    
+        index.write()?;
+    
+        Ok(file_count)
+    }
 }
