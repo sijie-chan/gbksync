@@ -1,7 +1,7 @@
 use git2::{Commit, Error, Oid, Repository};
 use std::{
     path::Path,
-    sync::{Arc, Mutex},
+    sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, thread::JoinHandle,
 };
 use tokio::time::{interval, Duration, Interval};
 use crate::git::*;
@@ -12,6 +12,9 @@ pub struct GitService {
     interval: usize,
     interval_count: u128,
     commit_interval: Interval,
+
+    running: Arc<AtomicBool>,
+    thread_handle: Option<JoinHandle<()>>,
 }
 
 impl GitService {
@@ -22,6 +25,8 @@ impl GitService {
             interval: 10,
             interval_count: 0,
             commit_interval: interval(Duration::from_secs(10)),
+            running: Arc::new(AtomicBool::new(false)),
+            thread_handle: None,
         })
     }
     pub fn setInterval(&mut self, i: usize) -> &Self {
@@ -29,15 +34,22 @@ impl GitService {
         // TODO update
         self
     }
-    pub fn start(&self) {
+    pub fn start(&mut self) {
         let repo = Arc::clone(&self.repo);
+        let running = Arc::clone(&self.running);
+
+        self.running.store(true, Ordering::SeqCst);
         // Lock
         // use thread
-        std::thread::spawn(move || {
+        let handle = std::thread::spawn(move || {
             let repo = repo.lock().unwrap();
-            stage_files(&repo).unwrap();
-            commit_files(&repo).unwrap();
-            push(&repo, "origin").unwrap();
+
+            while running.load(Ordering::SeqCst) {
+                stage_files(&repo).unwrap();
+                commit_files(&repo).unwrap();
+                push(&repo, "origin").unwrap();
+            }
+            
         });
     }
     pub fn stop(&self) {}
