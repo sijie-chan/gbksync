@@ -36,6 +36,7 @@ impl GitService {
         std::thread::spawn(move || {
             let repo = repo.lock().unwrap();
             stage_files(&repo).unwrap();
+            commit_files(&repo).unwrap();
             // self.stage_files();
             // self.commit_files();
             // self.push("origin");
