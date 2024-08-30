@@ -9,7 +9,7 @@ impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, String> {
         let repo = Repository::init(dir_path)?;
         GitService {
-            repo: ,
+            repo,
             interval: 10,
         }
     }
