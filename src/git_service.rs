@@ -17,7 +17,7 @@ impl GitService {
             repo,
             interval: 10,
             interval_count: 0,
-            commit_interval: interval(10),
+            commit_interval: interval(Duration::from_secs(10)),
         })
     }
     pub fn setInterval(&mut self, i: usize) -> &Self {
