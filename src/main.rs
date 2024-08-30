@@ -3,7 +3,7 @@ use git::*;
 
 use rui::*;
 use tokio::time::{interval, Duration};
-use tracing::info;
+use tracing::{info, error};
 use tracing_subscriber;
 
 #[tokio::main]
@@ -34,7 +34,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         if interval_count == 0 {
             info!("ready to push commits");
-            push(&repo, "origin").ok();
+            match push(&repo, "origin") {
+                Ok(_) => {},
+                Err(msg) => {
+                    error!(msg)
+                }
+            }
         }
     }
 }
