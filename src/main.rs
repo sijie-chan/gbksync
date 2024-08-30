@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             match push(&repo, "origin") {
                 Ok(_) => {},
                 Err(msg) => {
-                    error!(msg)
+                    error!(msg);
                 }
             }
         }
