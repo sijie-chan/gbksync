@@ -2,14 +2,22 @@ mod git;
 use git::*;
 
 use rui::*;
+use std::fs::File;
 use tokio::time::{interval, Duration};
 use tracing::{error, info};
-use tracing_subscriber;
+use tracing_subscriber::{self, fmt, prelude::*};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // 创建日志文件
+    let file = File::create("/tmp/gbksync.log")?;
+
     // install global collector configured based on RUST_LOG env var.
-    tracing_subscriber::fmt::init();
+    // 设置订阅者
+    tracing_subscriber::registry()
+        .with(fmt::layer().with_writer(file))
+        .with(fmt::layer().with_writer(std::io::stdout))
+        .init();
 
     let repo_path = "./";
     info!("open repository: {}", repo_path);
