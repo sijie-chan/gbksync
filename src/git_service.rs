@@ -65,15 +65,16 @@ impl GitService {
                         if let Ok(_) = commit_files(&repo) {
                             info!("committed files");
                         }
-                        if should_push {
-                            info!("start push files");
-                            if let Ok(_) = push(&repo, "origin") {
-                                info!("pushed files");
-                            }
-                        }
+                        
                     }
                     Ok(_) => info!("no files to stage"),
                     Err(e) => error!("failed to stage files: {}", e),
+                }
+                if should_push {
+                    info!("start push files");
+                    if let Ok(_) = push(&repo, "origin") {
+                        info!("pushed files");
+                    }
                 }
 
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
