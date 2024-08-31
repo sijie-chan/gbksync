@@ -20,7 +20,7 @@ pub fn stage_files(repo: &Repository) -> Result<usize, Error> {
     let mut file_count = 0;
 
     for file in statuses.iter() {
-        // let status = file.status();
+        let status = file.status();
         if let Some(p) = file.path() {
             info!("try staging file, path: {}", p);
             let path = Path::new(p);
