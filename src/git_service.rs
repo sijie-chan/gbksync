@@ -53,7 +53,7 @@ impl GitService {
 
             while running.load(Ordering::SeqCst) {
                 interval_count.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| {
-                    Some((v + 1) % 10)
+                    Some((v + 1))
                 }).ok();
 
                 info!("starting stage files");
