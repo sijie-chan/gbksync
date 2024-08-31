@@ -43,6 +43,7 @@ impl GitService {
         let repo = Arc::clone(&self.repo);
         let running = Arc::clone(&self.running);
         let interval = Arc::clone(&self.interval);
+        let interval_count = Arc::clone(&self.interval_count);
 
         self.running.store(true, Ordering::SeqCst);
         // Lock
