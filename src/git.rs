@@ -74,7 +74,7 @@ pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
     match Sysproxy::get_system_proxy() {
         Ok(res) => {
             info!("sysproxy: {:?}", res);
-            let proxy_url = format!("socks5://{}:{}", res.host, res.port);
+            let proxy_url = format!("http://{}:{}", res.host, 6153);
             info!("proxy url: {}", &proxy_url);
             proxy_opts.url(&proxy_url);
         }
