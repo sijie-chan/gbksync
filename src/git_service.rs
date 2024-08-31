@@ -1,23 +1,20 @@
 use crate::git::*;
 use git2::{Commit, Error, Oid, Repository};
-use std::cell::Cell;
 use std::{
-    path::Path,
     sync::{
         atomic::{AtomicBool, AtomicU64, Ordering},
         Arc, Mutex, RwLock,
     },
     thread::JoinHandle,
 };
-use tokio::time::{interval, Duration, Interval};
-use tracing::{info, error};
+use tokio::time::Duration;
+use tracing::{error, info};
 
 pub struct GitService {
     repo: Arc<Mutex<Repository>>,
     // seconds
     interval: Arc<AtomicU64>,
     interval_count: Arc<AtomicU64>,
-    commit_interval: Interval,
 
     running: Arc<AtomicBool>,
     thread_handle: Arc<RwLock<Option<JoinHandle<()>>>>,
@@ -30,7 +27,6 @@ impl GitService {
             repo: Arc::new(Mutex::new(repo)),
             interval: Arc::new(AtomicU64::new(10)),
             interval_count: Arc::new(AtomicU64::new(0)),
-            commit_interval: interval(Duration::from_secs(10)),
             running: Arc::new(AtomicBool::new(false)),
             thread_handle: Arc::new(RwLock::new(None)),
         })

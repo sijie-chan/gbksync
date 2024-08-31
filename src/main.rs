@@ -1,14 +1,10 @@
 mod git;
 mod git_service;
 
-use git::*;
-
 use git_service::GitService;
 use rui::*;
 use std::fs::File;
 use std::rc::Rc;
-use tokio::time::{interval, Duration};
-use tracing::{error, info};
 use tracing_subscriber::{self, filter::EnvFilter, fmt, prelude::*};
 
 #[tokio::main]
