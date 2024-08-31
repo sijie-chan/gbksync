@@ -35,6 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 button(if cx[started] { "stop" } else { "start" }, {
                     let git_service = git_service.clone();
                     move |cx| {
+                        cx.window_title = "gbksync".into();
                         cx[started] = !cx[started];
                         if cx[started] {
                             git_service.start();
