@@ -73,6 +73,7 @@ pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
     // 获取系统代理设置
     match Sysproxy::get_system_proxy() {
         Ok(res) => {
+            info!("sysproxy: {:?}", res);
             let proxy_url = format!("http://{}:{}", res.host, res.port);
             info!("proxy url: {}", &proxy_url);
             proxy_opts.url(&proxy_url);
