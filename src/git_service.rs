@@ -91,9 +91,12 @@ impl GitService {
 
         if let Ok(mut thread_handle) = self.thread_handle.write() {
             if let Some(handle) = thread_handle.take() {
-                if let Err(e) = handle.join() {
-                    eprintln!("Error joining thread: {:?}", e);
-                }
+                // 在新线程中等待原线程结束
+                std::thread::spawn(move || {
+                    if let Err(e) = handle.join() {
+                        eprintln!("Error joining thread: {:?}", e);
+                    }
+                });
             }
         } else {
             eprintln!("Failed to acquire write lock for thread_handle");
