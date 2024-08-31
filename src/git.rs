@@ -24,9 +24,21 @@ pub fn stage_files(repo: &Repository) -> Result<usize, Error> {
         if let Some(p) = file.path() {
             info!("try staging file, path: {}", p);
             let path = Path::new(p);
-            if let Ok(_) = index.add_path(path) {
-                info!("staged file: {:?}", path);
-                file_count += 1;
+            if status.is_wt_new()
+                || status.is_wt_modified()
+                || status.is_wt_renamed()
+                || status.is_wt_typechange()
+            {
+                if let Ok(_) = index.add_path(path) {
+                    info!("staged file: {:?}", path);
+                    file_count += 1;
+                }
+            } else if status.is_wt_deleted() {
+                // For deleted files
+                if let Ok(_) = index.remove_path(Path::new(path)) {
+                    info!("Staged file (delete): {:?}", path);
+                    file_count += 1;
+                }
             }
         }
     }
@@ -181,7 +193,10 @@ pub fn push_with_command(repo: &Repository) -> Result<(), Error> {
 
     let mut remotes = remotes.iter();
     while let Some(Some(remote)) = remotes.next() {
-        info!("pushing to {}, command: git push {} {}; current_dir: {:?}", remote, remote, branch, workdir);
+        info!(
+            "pushing to {}, command: git push {} {}; current_dir: {:?}",
+            remote, remote, branch, workdir
+        );
         let output = Command::new("git")
             .arg("push")
             .arg(remote)
