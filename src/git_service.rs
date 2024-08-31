@@ -52,11 +52,14 @@ impl GitService {
                     .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| Some((v + 1)))
                     .ok();
 
-                
                 let should_push = interval_count.load(Ordering::SeqCst) % 3 == 0;
-                
-                info!("interval_count: {}, should_push: {}", interval_count.load(Ordering::SeqCst), should_push);
-                
+
+                info!(
+                    "interval_count: {}, should_push: {}",
+                    interval_count.load(Ordering::SeqCst),
+                    should_push
+                );
+
                 info!("starting stage files");
                 match stage_files(&repo) {
                     Ok(file_count) if file_count > 0 => {
@@ -65,16 +68,17 @@ impl GitService {
                         if let Ok(_) = commit_files(&repo) {
                             info!("committed files");
                         }
-                        
                     }
                     Ok(_) => info!("no files to stage"),
                     Err(e) => error!("failed to stage files: {}", e),
                 }
                 if should_push {
                     info!("start push files");
-                    push(&repo, "origin").map_err(|e| {
-                        error!("failed to push files: {}", e);
-                    }).ok();
+                    push(&repo, "origin")
+                        .map_err(|e| {
+                            error!("failed to push files: {}", e);
+                        })
+                        .ok();
                 }
 
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))

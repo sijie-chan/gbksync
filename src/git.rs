@@ -1,5 +1,6 @@
-use git2::{Commit, Error, Oid, Repository};
+use git2::{Commit, Error, Oid, ProxyOptions, RemoteCallbacks, Repository};
 use std::path::Path;
+use tracing::info;
 
 pub fn open(dir_path: &str) -> Result<Repository, Error> {
     Repository::init(dir_path)
@@ -61,9 +62,18 @@ pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
 
 pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
     let mut remote = repo.find_remote(remote)?;
+    info!("{:?}", remote.name());
 
-    let refspecs: &[&str] = &[]; // Empty refspecs array
+    let refspecs: &[&str] = &["refs/heads/main:refs/heads/main"];
+    let callbacks = RemoteCallbacks::new();
+    let mut proxy_opts = ProxyOptions::new();
+
+    // 设置代理
+    proxy_opts.auto();
+
     let mut opts = git2::PushOptions::new();
+    opts.remote_callbacks(callbacks);
+    opts.proxy_options(proxy_opts);
 
     remote.push(refspecs, Some(&mut opts))?;
 
