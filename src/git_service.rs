@@ -52,7 +52,9 @@ impl GitService {
             let repo = repo.lock().unwrap();
 
             while running.load(Ordering::SeqCst) {
-                interval_count.fetch_add(1, Ordering::SeqCst);
+                interval_count.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| {
+                    Some(v + 1)
+                });
                 info!("starting stage files");
                 if let Ok(file_count) = stage_files(&repo) {
                     info!("staged {} files", file_count);
