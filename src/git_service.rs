@@ -10,7 +10,7 @@ use std::{
     thread::JoinHandle,
 };
 use tokio::time::{interval, Duration, Interval};
-use tracing::info;
+use tracing::{info, error};
 
 pub struct GitService {
     repo: Arc<Mutex<Repository>>,
@@ -35,7 +35,7 @@ impl GitService {
             thread_handle: Arc::new(RwLock::new(None)),
         })
     }
-    pub fn setInterval(&mut self, i: u64) -> &Self {
+    pub fn set_interval(&mut self, i: u64) -> &Self {
         self.interval.store(i, Ordering::SeqCst);
         self
     }
@@ -52,25 +52,31 @@ impl GitService {
             let repo = repo.lock().unwrap();
 
             while running.load(Ordering::SeqCst) {
-                interval_count.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| {
-                    Some((v + 1))
-                }).ok();
+                interval_count
+                    .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| Some((v + 1)))
+                    .ok();
 
                 let should_push = interval_count.load(Ordering::SeqCst) % 10 == 0;
 
                 info!("starting stage files");
-                if let Ok(file_count) = stage_files(&repo) {
-                    info!("staged {} files", file_count);
-                };
-                info!("starting commit files");
-                if let Ok(_) = commit_files(&repo) {
-                    info!("committed files");
-                }
-                if should_push {
-                    if let Ok(_) = push(&repo, "origin") {
-                        info!("pushed files");
+
+                match stage_files(&repo) {
+                    Ok(file_count) if file_count > 0 => {
+                        info!("staged {} files", file_count);
+                        info!("starting commit files");
+                        if let Ok(_) = commit_files(&repo) {
+                            info!("committed files");
+                        }
+                        if should_push {
+                            if let Ok(_) = push(&repo, "origin") {
+                                info!("pushed files");
+                            }
+                        }
                     }
+                    Ok(_) => info!("no files to stage"),
+                    Err(e) => error!("failed to stage files: {}", e),
                 }
+
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
             }
         });
