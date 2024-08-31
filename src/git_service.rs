@@ -79,7 +79,7 @@ impl GitService {
         if let Ok(mut thread_handle) = self.thread_handle.write() {
             *thread_handle = Some(handle);
         } else {
-            eprintln!("Failed to acquire write lock for thread_handle");
+            error!("Failed to acquire write lock for thread_handle");
         }
     }
     pub fn stop(&self) {
@@ -90,12 +90,12 @@ impl GitService {
                 // 在新线程中等待原线程结束
                 std::thread::spawn(move || {
                     if let Err(e) = handle.join() {
-                        eprintln!("Error joining thread: {:?}", e);
+                        error!("Error joining thread: {:?}", e);
                     }
                 });
             }
         } else {
-            eprintln!("Failed to acquire write lock for thread_handle");
+            error!("Failed to acquire write lock for thread_handle");
         }
     }
 }
