@@ -22,8 +22,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(fmt::layer().with_writer(std::io::stdout))
         .init();
 
-    let mut gitService = GitService::new("/Users/apple/Projects/gbksync")?;
-    gitService.start();
+    let mut git_service = GitService::new("/Users/apple/Projects/gbksync")?;
+    git_service.start();
+
+    let app = state(
+        || 1,
+        |count, cx| {
+            vstack((
+                cx[count].padding(Auto),
+                button("increment", move |cx| {
+                    cx[count] += 1;
+                })
+                .padding(Auto),
+            ))
+        },
+    );
+    rui::rui(app);
+    
 
     return Ok(());
 
