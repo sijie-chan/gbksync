@@ -72,9 +72,9 @@ impl GitService {
                 }
                 if should_push {
                     info!("start push files");
-                    if let Ok(_) = push(&repo, "origin") {
-                        info!("pushed files");
-                    }
+                    push(&repo, "origin").map_err(|e| {
+                        error!("failed to push files: {}", e);
+                    })
                 }
 
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
