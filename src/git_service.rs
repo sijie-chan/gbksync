@@ -74,7 +74,7 @@ impl GitService {
                     info!("start push files");
                     push(&repo, "origin").map_err(|e| {
                         error!("failed to push files: {}", e);
-                    })
+                    })?;
                 }
 
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
