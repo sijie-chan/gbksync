@@ -2,6 +2,8 @@ use git2::{Commit, Error, Oid, ProxyOptions, RemoteCallbacks, Repository};
 use std::path::Path;
 use tracing::info;
 
+use sysproxy::Sysproxy;
+
 pub fn open(dir_path: &str) -> Result<Repository, Error> {
     Repository::init(dir_path)
 }
@@ -68,8 +70,15 @@ pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
     let callbacks = RemoteCallbacks::new();
     let mut proxy_opts = ProxyOptions::new();
 
-    // 设置代理
-    proxy_opts.auto();
+    // 获取系统代理设置
+    match Sysproxy::get_system_proxy() {
+        Ok(res) => {
+            proxy_opts.url(&format!("http://{}:{}", res.host, res.port));
+        }
+        Err(_) => {
+            proxy_opts.auto();
+        }
+    };
 
     let mut opts = git2::PushOptions::new();
     opts.remote_callbacks(callbacks);

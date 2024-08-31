@@ -1,12 +1,15 @@
 mod git;
 mod git_service;
+mod macos_proxy;
 
 use git_service::GitService;
 use rui::*;
+use tracing::info;
 use std::fs::File;
 use std::rc::Rc;
 use tracing_subscriber::{self, filter::EnvFilter, fmt, prelude::*};
 use tracing_oslog::OsLogger;
+use sysproxy::Sysproxy;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
