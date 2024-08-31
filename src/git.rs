@@ -61,7 +61,6 @@ pub fn commit_files(repo: &Repository) -> Result<Oid, Error> {
 
 pub fn push(repo: &Repository, remote: &str) -> Result<(), Error> {
     let mut remote = repo.find_remote(remote)?;
-    println!("{:?}", remote.name());
 
     let refspecs: &[&str] = &[]; // Empty refspecs array
     let mut opts = git2::PushOptions::new();
