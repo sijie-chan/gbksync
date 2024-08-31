@@ -51,11 +51,17 @@ impl GitService {
             let repo = repo.lock().unwrap();
 
             while running.load(Ordering::SeqCst) {
-                info!("start to stage files");
-                stage_files(&repo).unwrap();
-                info!("start to commit files");
-                commit_files(&repo).unwrap();
-                push(&repo, "origin").unwrap();
+                info!("starting stage files");
+                if let Ok(file_count) = stage_files(&repo) {
+                    info!("staged {} files", file_count);
+                };
+                info!("starting commit files");
+                if let Ok(_) = commit_files(&repo) {
+                    info!("committed files");
+                }
+                if let Ok(_) = push(&repo, "origin") {
+                    info!("pushed files");
+                }
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
             }
         });
