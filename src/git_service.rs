@@ -66,8 +66,10 @@ impl GitService {
                 if let Ok(_) = commit_files(&repo) {
                     info!("committed files");
                 }
-                if let Ok(_) = push(&repo, "origin") {
-                    info!("pushed files");
+                if should_push {
+                    if let Ok(_) = push(&repo, "origin") {
+                        info!("pushed files");
+                    }
                 }
                 std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
             }
