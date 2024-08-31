@@ -177,7 +177,8 @@ pub fn push_with_command(repo: &Repository) -> Result<(), Error> {
         )
     })?;
 
-    while let Some(Some(remote)) = remotes.iter().next() {
+    let mut remotes = remotes.iter();
+    while let Some(Some(remote)) = remotes.next() {
         info!("pushing to {}, command: git push {} {}; current_dir: {:?}", remote, remote, branch, workdir);
         let output = Command::new("git")
             .arg("push")
