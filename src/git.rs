@@ -20,11 +20,10 @@ pub fn stage_files(repo: &Repository) -> Result<usize, Error> {
     let mut file_count = 0;
 
     for file in statuses.iter() {
-        let status = file.status();
-        if status.is_wt_new() || status.is_wt_modified() {
-            if let Some(p) = file.path() {
-                let path = Path::new(p);
-                index.add_path(path)?;
+        // let status = file.status();
+        if let Some(p) = file.path() {
+            let path = Path::new(p);
+            if let Ok(_) = index.add_path(path) {
                 file_count += 1;
             }
         }
