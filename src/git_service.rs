@@ -52,10 +52,10 @@ impl GitService {
                     .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| Some((v + 1)))
                     .ok();
 
-                info!("interval_count: {}", interval_count.load(Ordering::SeqCst));
-
+                
                 let should_push = interval_count.load(Ordering::SeqCst) % 10 == 0;
-
+                
+                info!("interval_count: {}, should_push: {}", interval_count.load(Ordering::SeqCst), should_push);
                 info!("starting stage files");
 
                 match stage_files(&repo) {
