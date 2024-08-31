@@ -1,24 +1,26 @@
 use crate::git::*;
 use git2::{Commit, Error, Oid, Repository};
+use std::cell::Cell;
 use std::{
     path::Path,
     sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc, Mutex,
+        atomic::{AtomicBool, AtomicU64, Ordering},
+        Arc, Mutex, RwLock,
     },
     thread::JoinHandle,
 };
 use tokio::time::{interval, Duration, Interval};
+use tracing::info;
 
 pub struct GitService {
     repo: Arc<Mutex<Repository>>,
     // seconds
-    interval: usize,
-    interval_count: u128,
+    interval: Arc<AtomicU64>,
+    interval_count: Arc<AtomicU64>,
     commit_interval: Interval,
 
     running: Arc<AtomicBool>,
-    thread_handle: Option<JoinHandle<()>>,
+    thread_handle: Arc<RwLock<Option<JoinHandle<()>>>>,
 }
 
 impl GitService {
@@ -26,21 +28,21 @@ impl GitService {
         let repo = Repository::init(repo_path)?;
         Ok(GitService {
             repo: Arc::new(Mutex::new(repo)),
-            interval: 10,
-            interval_count: 0,
+            interval: Arc::new(AtomicU64::new(10)),
+            interval_count: Arc::new(AtomicU64::new(0)),
             commit_interval: interval(Duration::from_secs(10)),
             running: Arc::new(AtomicBool::new(false)),
-            thread_handle: None,
+            thread_handle: Arc::new(RwLock::new(None)),
         })
     }
-    pub fn setInterval(&mut self, i: usize) -> &Self {
-        self.interval = i;
-        // TODO update
+    pub fn setInterval(&mut self, i: u64) -> &Self {
+        self.interval.store(i, Ordering::SeqCst);
         self
     }
-    pub fn start(&mut self) {
+    pub fn start(&self) {
         let repo = Arc::clone(&self.repo);
         let running = Arc::clone(&self.running);
+        let interval = Arc::clone(&self.interval);
 
         self.running.store(true, Ordering::SeqCst);
         // Lock
@@ -49,19 +51,31 @@ impl GitService {
             let repo = repo.lock().unwrap();
 
             while running.load(Ordering::SeqCst) {
+                info!("start to stage files");
                 stage_files(&repo).unwrap();
+                info!("start to commit files");
                 commit_files(&repo).unwrap();
                 push(&repo, "origin").unwrap();
+                std::thread::sleep(Duration::from_secs(interval.load(Ordering::SeqCst)))
             }
         });
-        self.thread_handle = Some(handle);
+        if let Ok(mut thread_handle) = self.thread_handle.write() {
+            *thread_handle = Some(handle);
+        } else {
+            eprintln!("Failed to acquire write lock for thread_handle");
+        }
     }
-    pub fn stop(&mut self) {
-        if let Some(handle) = self.thread_handle.take() {
-            self.running.store(false, Ordering::SeqCst);
-            if let Err(e) = handle.join() {
-                eprintln!("Error joining thread: {:?}", e);
+    pub fn stop(&self) {
+        self.running.store(false, Ordering::SeqCst);
+
+        if let Ok(mut thread_handle) = self.thread_handle.write() {
+            if let Some(handle) = thread_handle.take() {
+                if let Err(e) = handle.join() {
+                    eprintln!("Error joining thread: {:?}", e);
+                }
             }
+        } else {
+            eprintln!("Failed to acquire write lock for thread_handle");
         }
     }
 }

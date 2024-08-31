@@ -6,6 +6,7 @@ use git::*;
 use git_service::GitService;
 use rui::*;
 use std::fs::File;
+use std::rc::Rc;
 use tokio::time::{interval, Duration};
 use tracing::{error, info};
 use tracing_subscriber::{self, fmt, prelude::*};
@@ -22,23 +23,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(fmt::layer().with_writer(std::io::stdout))
         .init();
 
-    let mut git_service = GitService::new("/Users/apple/Projects/gbksync")?;
-    git_service.start();
+    let git_service = Rc::new(GitService::new("/Users/apple/Projects/gbksync")?);
 
     let app = state(
         || false,
-        |started, cx| {
+        move |started, cx| {
             vstack((
                 cx[started].padding(Auto),
-                button(if cx[started] {"stop"} else {"start"}, move |cx| {
-                    cx[started] = !cx[started];
+                button(if cx[started] { "stop" } else { "start" }, {
+                    let git_service = git_service.clone();
+                    move |cx| {
+                        cx[started] = !cx[started];
+                        if cx[started] {
+                            git_service.start();
+                        } else {
+                            git_service.stop();
+                        }
+                    }
                 })
                 .padding(Auto),
             ))
         },
     );
     rui::rui(app);
-    
 
     return Ok(());
 
