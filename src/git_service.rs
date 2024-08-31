@@ -53,7 +53,7 @@ impl GitService {
                     .ok();
 
                 
-                let should_push = interval_count.load(Ordering::SeqCst) % 10 == 0;
+                let should_push = interval_count.load(Ordering::SeqCst) % 3 == 0;
                 
                 info!("interval_count: {}, should_push: {}", interval_count.load(Ordering::SeqCst), should_push);
                 
