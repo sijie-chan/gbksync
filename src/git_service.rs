@@ -56,8 +56,8 @@ impl GitService {
                 let should_push = interval_count.load(Ordering::SeqCst) % 10 == 0;
                 
                 info!("interval_count: {}, should_push: {}", interval_count.load(Ordering::SeqCst), should_push);
+                
                 info!("starting stage files");
-
                 match stage_files(&repo) {
                     Ok(file_count) if file_count > 0 => {
                         info!("staged {} files", file_count);
