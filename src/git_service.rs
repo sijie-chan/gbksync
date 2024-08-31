@@ -49,7 +49,7 @@ impl GitService {
 
             while running.load(Ordering::SeqCst) {
                 interval_count
-                    .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| Some((v + 1)))
+                    .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| Some(v + 1))
                     .ok();
 
                 let should_push = interval_count.load(Ordering::SeqCst) % 3 == 0;
@@ -65,8 +65,18 @@ impl GitService {
                     Ok(file_count) if file_count > 0 => {
                         info!("staged {} files", file_count);
                         info!("starting commit files");
-                        if let Ok(_) = commit_files(&repo) {
-                            info!("committed files");
+                        if let Ok(is_updated) = check_is_updated(&repo) {
+                            // Make new commit, because I dont't want force push
+                            if is_updated {
+                                if let Ok(_) = commit_files(&repo) {
+                                    info!("committed files");
+                                }
+                            } else {
+                                info!("start amend");
+                                if let Ok(_) = commit_amend(&repo) {
+                                    info!("amended files");
+                                }
+                            }
                         }
                     }
                     Ok(_) => info!("no files to stage"),
@@ -74,7 +84,7 @@ impl GitService {
                 }
                 if should_push {
                     info!("start push files");
-                    push(&repo, "origin")
+                    push_with_command(&repo)
                         .map_err(|e| {
                             error!("failed to push files: {}", e);
                         })
