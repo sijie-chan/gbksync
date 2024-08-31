@@ -66,6 +66,7 @@ impl GitService {
                             info!("committed files");
                         }
                         if should_push {
+                            info!("start push files");
                             if let Ok(_) = push(&repo, "origin") {
                                 info!("pushed files");
                             }
