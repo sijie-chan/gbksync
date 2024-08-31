@@ -1,5 +1,5 @@
 use crate::git::*;
-use git2::{Commit, Error, Oid, Repository};
+use git2::{Commit, Error, Repository};
 use std::{
     sync::{
         atomic::{AtomicBool, AtomicU64, Ordering},
