@@ -26,12 +26,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     git_service.start();
 
     let app = state(
-        || 1,
-        |count, cx| {
+        || false,
+        |started, cx| {
             vstack((
-                cx[count].padding(Auto),
-                button("increment", move |cx| {
-                    cx[count] += 1;
+                cx[started].padding(Auto),
+                button(if cx[started] {"stop"} else {"start"}, move |cx| {
+                    cx[started] = !cx[started];
                 })
                 .padding(Auto),
             ))
