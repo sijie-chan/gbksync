@@ -6,6 +6,7 @@ use rui::*;
 use std::fs::File;
 use std::rc::Rc;
 use tracing_subscriber::{self, filter::EnvFilter, fmt, prelude::*};
+use tracing_oslog::OsLogger;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,6 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(EnvFilter::from_default_env())
         .with(fmt::layer().with_writer(file))
         .with(fmt::layer().with_writer(std::io::stdout))
+        .with(OsLogger::new("online.welkin.gbksync", "default"))
         .init();
 
     let git_service = Rc::new(GitService::new("/Users/apple/Projects/gbksync")?);
