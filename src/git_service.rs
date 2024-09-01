@@ -61,28 +61,27 @@ impl GitService {
                 );
 
                 info!("starting stage files");
+                let mut is_updated = false;
                 match stage_files(&repo) {
                     Ok(file_count) if file_count > 0 => {
                         info!("staged {} files", file_count);
                         info!("starting commit files");
-                        if let Ok(is_updated) = check_is_updated(&repo) {
-                            // Make new commit, because I dont't want force push
-                            if is_updated {
-                                if let Ok(_) = commit_files(&repo) {
-                                    info!("committed files");
-                                }
-                            } else {
-                                info!("start amend");
-                                if let Ok(_) = commit_amend(&repo) {
-                                    info!("amended files");
-                                }
+                        is_updated = check_is_updated(&repo).unwrap_or(false);
+                        if is_updated {
+                            if let Ok(_) = commit_files(&repo) {
+                                info!("committed files");
+                            }
+                        } else {
+                            info!("start amend");
+                            if let Ok(_) = commit_amend(&repo) {
+                                info!("amended files");
                             }
                         }
                     }
                     Ok(_) => info!("no files to stage"),
                     Err(e) => error!("failed to stage files: {}", e),
                 }
-                if should_push {
+                if should_push && !is_updated {
                     info!("start push files");
                     push_with_command(&repo)
                         .map_err(|e| {
