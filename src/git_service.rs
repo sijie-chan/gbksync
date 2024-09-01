@@ -61,7 +61,7 @@ impl GitService {
                 );
 
                 info!("starting stage files");
-                let mut is_updated = false;
+                let mut is_updated = check_is_updated(&repo).unwrap_or(false);
                 match stage_files(&repo) {
                     Ok(file_count) if file_count > 0 => {
                         info!("staged {} files", file_count);
