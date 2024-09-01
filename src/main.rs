@@ -1,15 +1,23 @@
 mod git;
 mod git_service;
 mod network;
+mod ui;
 
 use git_service::GitService;
 use rui::*;
 use std::fs::File;
 use std::rc::Rc;
+use ui::*;
 
 use tracing::info;
 use tracing_oslog::OsLogger;
 use tracing_subscriber::{self, filter::EnvFilter, fmt, prelude::*};
+
+#[derive(Clone)]
+struct AppState {
+    started: bool,
+    git_service: Rc<GitService>,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -26,24 +34,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .init();
 
     let git_service = Rc::new(GitService::new("/Users/apple/Projects/gbksync")?);
+    let c = git_service.clone();
 
     let app = state(
-        || false,
-        move |started, cx| {
+        move || AppState {
+            started: false,
+            git_service: c.clone(),
+        },
+        move |root_state, cx| {
             vstack((
-                cx[started].padding(Auto),
-                button(if cx[started] { "stop" } else { "start" }, {
-                    let git_service = git_service.clone();
-                    move |cx| {
-                        cx.window_title = "gbksync".into();
-                        cx[started] = !cx[started];
-                        if cx[started] {
-                            git_service.start();
-                        } else {
-                            git_service.stop();
+                cx[root_state].started.padding(Auto),
+                button(
+                    if cx[root_state].started {
+                        "stop"
+                    } else {
+                        "start"
+                    },
+                    {
+                        let git_service = git_service.clone();
+                        move |cx| {
+                            cx.window_title = "gbksync".into();
+                            cx[root_state].started = !cx[root_state].started;
+                            if cx[root_state].started {
+                                git_service.start();
+                            } else {
+                                git_service.stop();
+                            }
                         }
-                    }
-                })
+                    },
+                )
                 .padding(Auto),
             ))
         },
