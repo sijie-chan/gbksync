@@ -208,3 +208,17 @@ pub fn push_with_command(repo: &Repository) -> Result<(), Error> {
 
     Ok(())
 }
+
+
+#[cfg(test)]
+mod test_git {
+    use crate::git::*;
+    use git2::Repository;
+
+    #[test]
+    fn test_check_is_updated() {
+        let repo = Repository::init("./").unwrap();
+        let is_updated = check_is_updated(&repo).unwrap_or(false);
+        println!("is_updated: {}", is_updated);
+    }
+}
