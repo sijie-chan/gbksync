@@ -82,7 +82,7 @@ impl GitService {
                     Err(e) => error!("failed to stage files: {}", e),
                 }
                 if should_push && !is_updated {
-                    info!("start push files");
+                    info!("start push files, is_updated: {}", is_updated);
                     push_with_command(&repo)
                         .map_err(|e| {
                             error!("failed to push files: {}", e);
