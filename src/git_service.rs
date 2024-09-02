@@ -1,6 +1,7 @@
 use crate::git::*;
 use git2::{Error, Repository};
 use std::{
+    fmt::Debug,
     sync::{
         atomic::{AtomicBool, AtomicU64, Ordering},
         Arc, Mutex, RwLock,
@@ -11,19 +12,34 @@ use tokio::time::Duration;
 use tracing::{error, info};
 
 pub struct GitService {
+    pub repo_path: String,
     repo: Arc<Mutex<Repository>>,
     // seconds
     interval: Arc<AtomicU64>,
     interval_count: Arc<AtomicU64>,
 
-    running: Arc<AtomicBool>,
+    pub running: Arc<AtomicBool>,
     thread_handle: Arc<RwLock<Option<JoinHandle<()>>>>,
+}
+
+impl Debug for GitService {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GitService")
+            .field("repo_path", &self.repo_path)
+            .field("repo", &"<Repo>")
+            .field("interval", &self.interval)
+            .field("interval_count", &self.interval_count)
+            .field("running", &self.running)
+            .field("thread_handle", &self.thread_handle)
+            .finish()
+    }
 }
 
 impl GitService {
     pub fn new(repo_path: &str) -> Result<Self, Error> {
         let repo = Repository::init(repo_path)?;
         Ok(GitService {
+            repo_path: repo_path.into(),
             repo: Arc::new(Mutex::new(repo)),
             interval: Arc::new(AtomicU64::new(10)),
             interval_count: Arc::new(AtomicU64::new(0)),

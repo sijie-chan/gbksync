@@ -209,7 +209,6 @@ pub fn push_with_command(repo: &Repository) -> Result<(), Error> {
     Ok(())
 }
 
-
 #[cfg(test)]
 mod test_git {
     use crate::git::*;

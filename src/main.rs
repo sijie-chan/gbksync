@@ -1,12 +1,15 @@
+mod config;
 mod git;
 mod git_service;
 mod network;
 mod ui;
 
+use config::*;
 use git_service::GitService;
 use rui::*;
-use std::fs::File;
+use std::cell::Cell;
 use std::rc::Rc;
+use std::{fs::File, vec};
 use ui::*;
 
 use tracing::info;
@@ -21,6 +24,9 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = AppConfig::init();
+    info!("config: {:?}", config);
+    dbg!(&config);
     // 创建日志文件
     let file = File::create("/tmp/gbksync.log")?;
 
@@ -36,6 +42,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let git_service = Rc::new(GitService::new("/Users/apple/Projects/gbksync")?);
     let c = git_service.clone();
 
+    let repos = Rc::new(vec![Repo {
+        path: Rc::new("./".to_string()),
+        service: Rc::new(GitService::new("/Users/apple/Projects/gbksync")?),
+        started: Cell::new(false),
+        id: "1".to_string(),
+    }]);
+
+    let app_view = app_view(repos);
     let app = state(
         move || AppState {
             started: false,
@@ -51,14 +65,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         "start"
                     },
                     {
-                        let git_service = git_service.clone();
                         move |cx| {
                             cx.window_title = "gbksync".into();
                             cx[root_state].started = !cx[root_state].started;
                             if cx[root_state].started {
-                                git_service.start();
+                                cx[root_state].git_service.start();
                             } else {
-                                git_service.stop();
+                                cx[root_state].git_service.stop();
                             }
                         }
                     },
@@ -67,7 +80,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ))
         },
     );
-    rui::rui(app);
+    rui::rui(app_view);
 
     return Ok(());
 }

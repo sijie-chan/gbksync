@@ -11,8 +11,10 @@ tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 tracing-oslog = "=0.1.2"
 tracing-subscriber = { version = "0.3", features = ["std", "env-filter"] }
-core-foundation = "0.9"
+core-foundation = "0.10.0"
 objc = "0.2"
+serde = { version = "1.0.209", features=["std", "derive", "serde_derive"] }
+serde_json = "1.0.127"
 
 
 [package.metadata.bundle]
@@ -25,3 +27,8 @@ short_description = "An Scheduled Git committer & pusher."
 long_description = """
 This tool help schedule commit and push files.
 """
+
+[lib]
+crate-type=["rlib", "dylib"]
+name = "gbksync"
+path = "src/lib.rs"
