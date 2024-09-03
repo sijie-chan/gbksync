@@ -41,7 +41,6 @@ fn calc_repos(config: Arc<RwLock<AppConfig>>) -> Rc<Vec<Rc<Repo>>> {
     )
 }
 
-pub fn left_view() {}
 pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
     let config_clone = config.clone();
     let repos = calc_repos(config_clone.clone());
@@ -97,7 +96,8 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                                 info!("after update state");
                             }
                         }),
-                    )),
+                    ))
+                    .padding(Auto),
                     list(repos.as_ref().clone(), move |repo| {
                         let id = repo.id.clone();
                         text(&format!(
@@ -111,13 +111,18 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                         ))
                         .color(Color::new(0., 0., 0., 1.))
                         .padding(Auto)
-                        .background(rectangle().tap(move |ctx| {
-                            info!("tap: {}", id);
-                            let root_state = root_state.clone();
-                            ctx[root_state].current = Some(id.clone());
-                        }))
+                        .background(
+                            rectangle()
+                                .color(Color::new(1., 1., 1., 0.))
+                                .tap(move |ctx| {
+                                    info!("tap: {}", id);
+                                    let root_state = root_state.clone();
+                                    ctx[root_state].current = Some(id.clone());
+                                }),
+                        )
+                        .flex()
                     })
-                    .background(rectangle().color(RED_HIGHLIGHT))
+                    // .background(rectangle().color(RED_HIGHLIGHT))
                     .padding(Auto)
                     .flex(),
                 )), // Adjust the flex value to control the width ratio
