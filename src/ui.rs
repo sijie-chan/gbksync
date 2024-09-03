@@ -55,6 +55,7 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                 .current
                 .as_ref()
                 .map_or("".to_string(), |v| v.to_string());
+            let current_clone = current.clone();
             let (repo_path, repo_status, repo_repo) = cx[root_state.clone()]
                 .repos
                 .iter()
@@ -109,7 +110,11 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                                 .last()
                                 .unwrap_or(&repo.service.repo_path)
                         ))
-                        .color(Color::new(0., 0., 0., 1.))
+                        .color(if id.clone() == current_clone {
+                            AZURE_HIGHLIGHT_DARK
+                        } else {
+                            Color::new(0., 0., 0., 0.8)
+                        })
                         .padding(Auto)
                         .background(
                             rectangle()
