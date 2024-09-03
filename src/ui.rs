@@ -4,8 +4,9 @@ use rfd::FileDialog;
 use rui::*;
 use std::cell::Cell;
 use std::rc::Rc;
-use tracing::info;
 use std::sync::{Arc, RwLock};
+use tracing::info;
+use vger::Color;
 
 impl core::hash::Hash for Repo {
     fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
@@ -76,7 +77,7 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                 // Repo list
                 vstack((
                     hstack((
-                        text("Repos"),
+                        text("Repos").color(Color::new(0., 0., 0., 1.)),
                         button("Add", move |ctx| {
                             // open finder file picker
                             // Save the selected folder to the config
@@ -94,22 +95,31 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                                 // refresh state
                                 ctx[root_state.clone()].repos = calc_repos(config_clone.clone());
                                 info!("after update state");
-
                             }
                         }),
                     )),
                     list(repos.as_ref().clone(), move |repo| {
                         let id = repo.id.clone();
-                        text(&format!("{}", &repo.service.repo_path))
-                            .padding(Auto)
-                            .background(rectangle().tap(move |ctx| {
-                                info!("tap: {}", id);
-                                let root_state = root_state.clone();
-                                ctx[root_state].current = Some(id.clone());
-                            }))
+                        text(&format!(
+                            "{}",
+                            &repo
+                                .service
+                                .repo_path
+                                .split("/")
+                                .last()
+                                .unwrap_or(&repo.service.repo_path)
+                        ))
+                        .color(Color::new(0., 0., 0., 1.))
+                        .padding(Auto)
+                        .background(rectangle().tap(move |ctx| {
+                            info!("tap: {}", id);
+                            let root_state = root_state.clone();
+                            ctx[root_state].current = Some(id.clone());
+                        }))
                     })
                     .background(rectangle().color(RED_HIGHLIGHT))
-                    .padding(Auto),
+                    .padding(Auto)
+                    .flex(),
                 )), // Adjust the flex value to control the width ratio
                 // Details view
                 // Name
@@ -136,7 +146,7 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                 .flex(), // Adjust the flex value to control the width ratio
             ))
             .window_title("gbksync")
-            .background(rectangle().color(AZURE_HIGHLIGHT))
+            .background(rectangle().color(Color::new(0.8, 0.8, 0.8, 1.)))
             .flex()
         },
     )

@@ -9,9 +9,9 @@ use git_service::GitService;
 use rui::*;
 use std::cell::Cell;
 use std::rc::Rc;
+use std::sync::{Arc, RwLock};
 use std::{fs::File, vec};
 use ui::*;
-use std::sync::{Arc, RwLock};
 
 use tracing::info;
 use tracing_oslog::OsLogger;

@@ -991,6 +991,7 @@ dependencies = [
  "tracing-oslog",
  "tracing-subscriber",
  "uuid",
+ "vger",
 ]
 
 [[package]]
