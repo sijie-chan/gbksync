@@ -11,6 +11,7 @@ use std::cell::Cell;
 use std::rc::Rc;
 use std::{fs::File, vec};
 use ui::*;
+use std::sync::{Arc, RwLock};
 
 use tracing::info;
 use tracing_oslog::OsLogger;
@@ -24,7 +25,7 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = AppConfig::init();
+    let config = Arc::new(RwLock::new(AppConfig::init()));
     info!("config: {:?}", config);
     dbg!(&config);
     // 创建日志文件
@@ -42,14 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let git_service = Rc::new(GitService::new("/Users/apple/Projects/gbksync")?);
     let c = git_service.clone();
 
-    let repos = Rc::new(vec![Repo {
-        path: Rc::new("./".to_string()),
-        service: Rc::new(GitService::new("/Users/apple/Projects/gbksync")?),
-        started: Cell::new(false),
-        id: "1".to_string(),
-    }]);
-
-    let app_view = app_view(repos);
+    let app_view = app_view(config);
     let app = state(
         move || AppState {
             started: false,

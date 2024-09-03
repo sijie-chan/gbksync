@@ -15,11 +15,14 @@ core-foundation = "0.10.0"
 objc = "0.2"
 serde = { version = "1.0.209", features=["std", "derive", "serde_derive"] }
 serde_json = "1.0.127"
+rfd = "0.14.1"
+uuid = { version = "1.10.0", features = ["std", "v4"] }
 
 
 [package.metadata.bundle]
 name = "GitBackSync"
 identifier = "online.welkin.gbksync"
+icon = ["32x32.png", "128x128.png", "128x128@2x.png"]
 version = "1.0.0"
 category = "Developer Tool"
 copyright = "Copyright (c) Yuhang Qin 2024. All rights reserved."

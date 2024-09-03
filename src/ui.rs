@@ -1,8 +1,11 @@
 use crate::config::*;
 use crate::git_service::GitService;
+use rfd::FileDialog;
 use rui::*;
+use std::cell::Cell;
 use std::rc::Rc;
 use tracing::info;
+use std::sync::{Arc, RwLock};
 
 impl core::hash::Hash for Repo {
     fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
@@ -12,12 +15,35 @@ impl core::hash::Hash for Repo {
 
 #[derive(Clone)]
 pub struct AppState {
-    repos: Rc<Vec<Repo>>,
+    repos: Rc<Vec<Rc<Repo>>>,
     current: Option<String>,
 }
 
+fn calc_repos(config: Arc<RwLock<AppConfig>>) -> Rc<Vec<Rc<Repo>>> {
+    info!("calc_repos");
+    Rc::new(
+        config
+            .read()
+            .unwrap()
+            .get_repos()
+            .iter()
+            .map(|val| {
+                info!("map of calc_repos {:?}", val);
+                Rc::new(Repo {
+                    path: Rc::new(val.path.to_string()),
+                    service: Rc::new(GitService::new(&val.path.to_string()).unwrap()),
+                    started: Cell::new(false),
+                    id: val.id.to_string(),
+                })
+            })
+            .collect::<Vec<Rc<Repo>>>(),
+    )
+}
+
 pub fn left_view() {}
-pub fn app_view(repos: Rc<Vec<Repo>>) -> impl View {
+pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
+    let config_clone = config.clone();
+    let repos = calc_repos(config_clone.clone());
     state(
         move || AppState {
             repos: repos.clone(),
@@ -29,20 +55,23 @@ pub fn app_view(repos: Rc<Vec<Repo>>) -> impl View {
                 .current
                 .as_ref()
                 .map_or("".to_string(), |v| v.to_string());
-            let (repo_path, repo_status) = cx[root_state.clone()]
+            let (repo_path, repo_status, repo_repo) = cx[root_state.clone()]
                 .repos
-                .as_ref()
                 .iter()
-                .filter(|&repo| repo.id == current)
-                .collect::<Vec<&Repo>>()
-                .first()
-                .map_or(("", ""), |&repo| {
-                    if repo.service.running.load(std::sync::atomic::Ordering::SeqCst) {
-                        (repo.path.as_str(), "started")
+                .find(|repo| repo.id == current)
+                .map(|repo| {
+                    if repo
+                        .service
+                        .running
+                        .load(std::sync::atomic::Ordering::SeqCst)
+                    {
+                        (repo.path.as_str(), "started", Some(repo.clone()))
                     } else {
-                        (repo.path.as_str(), "stoped")
+                        (repo.path.as_str(), "stopped", Some(repo.clone()))
                     }
-                });
+                })
+                .unwrap_or(("", "", None));
+            let config_clone = config_clone.clone();
             hstack((
                 // Repo list
                 vstack((
@@ -50,9 +79,24 @@ pub fn app_view(repos: Rc<Vec<Repo>>) -> impl View {
                         text("Repos"),
                         button("Add", move |ctx| {
                             // open finder file picker
+                            // Save the selected folder to the config
+                            let mut should_refresh = false;
+                            if let Some(dir) = FileDialog::new().set_directory("/").pick_folder() {
+                                if let Ok(config) = config_clone.write() {
+                                    info!("before add to config");
+                                    config.add(dir.to_string_lossy().to_string());
+                                    info!("after add to config");
+                                    should_refresh = true;
+                                }
+                            }
+                            if should_refresh {
+                                // refresh state
+                                ctx[root_state.clone()].repos = calc_repos(config_clone.clone());
+                                info!("after update state");
+                            }
                         }),
                     )),
-                    list(repos.as_ref().clone(), move |repo: &Repo| {
+                    list(repos.as_ref().clone(), move |repo| {
                         let id = repo.id.clone();
                         text(&format!("{}", &repo.service.repo_path))
                             .padding(Auto)
@@ -72,21 +116,18 @@ pub fn app_view(repos: Rc<Vec<Repo>>) -> impl View {
                 vstack((
                     text(repo_path),
                     text(&current).padding(Auto),
-                    button(repo_status, move |ctx| {
-                        let _ = ctx[root_state.clone()]
-                            .repos
-                            .iter()
-                            .filter(|&repo| repo.id == current)
-                            .collect::<Vec<&Repo>>()
-                            .first()
-                            .map_or("", |&repo| {
-                                if repo.service.running.load(std::sync::atomic::Ordering::SeqCst) {
-                                    repo.service.stop();
-                                } else {
-                                    repo.service.start();
-                                };
-                                ""
-                            });
+                    button(repo_status, move |_ctx| {
+                        if let Some(ref repo) = repo_repo {
+                            if repo
+                                .service
+                                .running
+                                .load(std::sync::atomic::Ordering::SeqCst)
+                            {
+                                repo.service.stop();
+                            } else {
+                                repo.service.start();
+                            }
+                        }
                     }),
                 ))
                 .flex(), // Adjust the flex value to control the width ratio

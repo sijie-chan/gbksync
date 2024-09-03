@@ -1,13 +1,14 @@
 use crate::git_service::*;
 use serde::{Deserialize, Serialize};
+use std::cell::Cell;
 use std::env;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
-use std::cell::Cell;
 /// config file definition
 ///
 use std::{cell::RefCell, fs, rc::Rc};
+use uuid::Uuid;
 
 const APP_NAME: &str = "gbksync";
 
@@ -47,9 +48,7 @@ pub struct Repo {
     pub id: String,
 }
 
-impl Repo {
-
-}
+impl Repo {}
 
 #[derive(Default, Debug)]
 pub struct AppConfig {
@@ -115,6 +114,17 @@ impl AppConfig {
     }
     pub fn get_repos(&self) -> Vec<Repo> {
         self.repos.borrow().clone()
+    }
+
+    pub fn add(&self, repo_path: String) -> &Self {
+        let id = Uuid::new_v4().to_string();
+        self.repos.borrow_mut().push(Repo {
+            path: Rc::new(repo_path.clone()),
+            service: Rc::new(GitService::new(&repo_path).unwrap()),
+            started: Cell::new(false),
+            id,
+        });
+        self
     }
 
     fn ensure_config_dir() -> Result<(), Box<dyn std::error::Error>> {
