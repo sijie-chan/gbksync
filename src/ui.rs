@@ -85,6 +85,7 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                                 if let Ok(config) = config_clone.write() {
                                     info!("before add to config");
                                     config.add(dir.to_string_lossy().to_string());
+                                    config.save().unwrap_or(());
                                     info!("after add to config");
                                     should_refresh = true;
                                 }
@@ -93,6 +94,7 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                                 // refresh state
                                 ctx[root_state.clone()].repos = calc_repos(config_clone.clone());
                                 info!("after update state");
+
                             }
                         }),
                     )),
@@ -130,9 +132,12 @@ pub fn app_view(config: Arc<RwLock<AppConfig>>) -> impl View {
                         }
                     }),
                 ))
+                .background(rectangle().color(RED_HIGHLIGHT_DARK))
                 .flex(), // Adjust the flex value to control the width ratio
             ))
             .window_title("gbksync")
+            .background(rectangle().color(AZURE_HIGHLIGHT))
+            .flex()
         },
     )
 }
