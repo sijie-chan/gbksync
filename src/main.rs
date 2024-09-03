@@ -40,40 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(OsLogger::new("online.welkin.gbksync", "default"))
         .init();
 
-    let git_service = Rc::new(GitService::new("/Users/apple/Projects/gbksync")?);
-    let c = git_service.clone();
-
     let app_view = app_view(config);
-    let app = state(
-        move || AppState {
-            started: false,
-            git_service: c.clone(),
-        },
-        move |root_state, cx| {
-            vstack((
-                cx[root_state].started.padding(Auto),
-                button(
-                    if cx[root_state].started {
-                        "stop"
-                    } else {
-                        "start"
-                    },
-                    {
-                        move |cx| {
-                            cx.window_title = "gbksync".into();
-                            cx[root_state].started = !cx[root_state].started;
-                            if cx[root_state].started {
-                                cx[root_state].git_service.start();
-                            } else {
-                                cx[root_state].git_service.stop();
-                            }
-                        }
-                    },
-                )
-                .padding(Auto),
-            ))
-        },
-    );
     rui::rui(app_view);
 
     return Ok(());

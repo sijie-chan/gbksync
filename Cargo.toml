@@ -18,6 +18,7 @@ serde_json = "1.0.127"
 rfd = "0.14.1"
 uuid = { version = "1.10.0", features = ["std", "v4"] }
 vger = "0.2.7"
+tauri = "1.7.2"
 
 
 [package.metadata.bundle]
