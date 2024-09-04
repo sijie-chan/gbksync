@@ -1975,10 +1975,8 @@ dependencies = [
 name = "gbksync"
 version = "0.1.0"
 dependencies = [
- "core-foundation 0.10.0",
  "git2",
  "gpui",
- "objc",
  "rfd",
  "rui",
  "serde",
