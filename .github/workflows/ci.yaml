@@ -20,6 +20,10 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+      - name: cargo install bundle
+        uses: actions-rs/cargo@v1
+        with:
+          command: install cargo-bundle
       - name: cargo test
         uses: actions-rs/cargo@v1
         with:
