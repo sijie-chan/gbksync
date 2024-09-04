@@ -48,7 +48,11 @@ pub struct Repo {
     pub id: String,
 }
 
-impl Repo {}
+impl core::hash::Hash for Repo {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.path.hash(state);
+    }
+}
 
 #[derive(Default, Debug)]
 pub struct AppConfig {

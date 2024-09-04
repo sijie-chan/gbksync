@@ -7,7 +7,7 @@ mod ui_gpui;
 
 use config::*;
 use git_service::GitService;
-use rui::*;
+// use rui::*;
 use std::cell::Cell;
 use std::rc::Rc;
 use std::sync::{Arc, RwLock};

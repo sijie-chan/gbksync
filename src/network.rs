@@ -50,5 +50,5 @@ pub fn get_http_proxy() -> Option<String> {
 #[test]
 fn test_get_http_proxy() {
     let proxy = get_http_proxy();
-    println!("proxy: {}", proxy.unwrap());
+    println!("proxy: {:?}", proxy);
 }
